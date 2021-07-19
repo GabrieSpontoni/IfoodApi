@@ -1,9 +1,7 @@
 require ('dotenv').config ({path: './.env.centralizado'})
-const express = require('express')
 const axios = require('axios');
 const qs = require('qs')
 
-const app = express();
 
 
 
@@ -29,8 +27,33 @@ const getToken = async () => {
     return(result.data);
 }
 
+
+const getMerchants = async (accessToken) => {
+    const config = {
+        method:   'get',
+        url: 'https://merchant-api.ifood.com.br/merchant/v1.0/merchants',
+        headers: {
+            Authorization: `Bearer ${accessToken}`,
+            'Content-type': 'application/x-www-form-urlencoded',
+          }
+
+
+    }
+    const result = await axios(config)
+    return(result);
+}
+
+
 const run = async() => {
     const token = await getToken();
-    console.log(token);
+    //console.log(token);
+    
+    const accessToken = token.accessToken;
+    //console.log(accessToken);
+
+    const merchants = await getMerchants(accessToken);
+    console.log (merchants.data);
+
+
 }
 run()
