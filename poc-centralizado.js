@@ -56,10 +56,10 @@ const getPolling = async (accessToken) => {
 }
 
 
-const requestDriver = async (accessToken) => {
+const requestDriver = async (accessToken,orderId) => {
     const config = {
         method: 'post',
-        url:   'https://merchant-api.ifood.com.br/order/v1.0/orders/2d0b04a5-dd9e-419e-a3ae-7e30bd9941d5/requestDriver',
+        url:   'https://merchant-api.ifood.com.br/order/v1.0/orders/'+orderId+'/requestDriver',
         headers: {
             Authorization: `Bearer ${accessToken}`,
         },
@@ -82,7 +82,8 @@ const run = async() => {
     const polling = await getPolling(accessToken);
     //console.log (polling.data)
 
-    const driver = await requestDriver(accessToken);
+    const orderId = '2d0b04a5-dd9e-419e-a3ae-7e30bd9941d5'
+    const driver = await requestDriver(accessToken,orderId);
     console.log(driver.status, driver.statusText);
 
 
