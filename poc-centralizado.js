@@ -43,16 +43,47 @@ const getMerchants = async (accessToken) => {
     return(result);
 }
 
+const getPolling = async (accessToken) => {
+    const config = {
+        method : 'get',
+        url: 'https://merchant-api.ifood.com.br/order/v1.0/events:polling?types=PLC%2CREC%2CCFM&groups=ORDER_STATUS%2CDELIVERY',
+        headers: {
+            Authorization: `Bearer ${accessToken}`,
+        },
+    }
+    const result = await axios(config)
+    return(result);
+}
+
+
+const requestDriver = async (accessToken) => {
+    const config = {
+        method: 'post',
+        url:   'https://merchant-api.ifood.com.br/order/v1.0/orders/2d0b04a5-dd9e-419e-a3ae-7e30bd9941d5/requestDriver',
+        headers: {
+            Authorization: `Bearer ${accessToken}`,
+        },
+    }
+    const result = await axios(config)
+    return(result);
+}
+
 
 const run = async() => {
     const token = await getToken();
     //console.log(token);
     
     const accessToken = token.accessToken;
-    //console.log(accessToken);
+    console.log(accessToken);
 
     const merchants = await getMerchants(accessToken);
-    console.log (merchants.data);
+    //console.log (merchants.data);
+
+    const polling = await getPolling(accessToken);
+    //console.log (polling.data)
+
+    const driver = await requestDriver(accessToken);
+    console.log(driver.status, driver.statusText);
 
 
 }
