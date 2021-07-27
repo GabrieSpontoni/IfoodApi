@@ -3,6 +3,8 @@ const axios = require ('axios');
 const qs = require ('qs')
 
 
+//link para pedir autorizacao : https://www.youtube.com/watch?v=fzjOrxH5olk&ab_channel=iFoodDeveloper
+
 
 const userCode = async () => {
 
@@ -32,6 +34,26 @@ const getToken = async (authorizationCodeVerifier,codeApp) => {
             clientSecret: process.env.clientSecret,
             authorizationCode: codeApp,
             authorizationCodeVerifier: authorizationCodeVerifier,
+            
+        }),
+        headers: {
+            'Content-type': 'application/x-www-form-urlencoded',
+        },
+
+    }
+    const result = await axios(config);
+    return (result);
+}
+
+const tokenRefresh = async (refreshToken) => {
+    const config = {
+        method: 'post',
+        url: 'https://merchant-api.ifood.com.br/authentication/v1.0/oauth/token',
+        data:qs.stringify({
+            grantType : 'refresh_token',
+            clientId: process.env.clientId,
+            clientSecret: process.env.clientSecret,
+            refreshToken: refreshToken,
             
         }),
         headers: {
@@ -86,31 +108,37 @@ const requestDriver = async (accessToken,orderId) => {
 
 
 const run = async () => {
+
     //1 - gerar codigo de usuario
     // const codeUser = await userCode();
     // console.log (codeUser.data);
 
     //2 - gerar token unico
-    // const authorizationCodeVerifier = '4xb2olocytw306hjlfz4f1m5qvyl5wkl0xuiu71b2kfzcgdckfhye6pu9k2ecccvc6cekbrcceop41zm2mvplbixb5kl2mir27a'
-    // const codeApp = 'LSHN-BMLP'
+    // const authorizationCodeVerifier = 'kotm8nvv8wzfd014rbovssht47if0sx62ntkgtsk6shc0cbwhxn68y9zm1bjaa43t1hekyyh7iom0pxdn6houp2odyw4lljfrdq'
+    // const codeApp = 'HTHS-VWPW'
     // const token = await getToken(authorizationCodeVerifier, codeApp);
     // console.log(token.data)
     // accessToken = token.data.accessToken
     // console.log (accessToken)
 
 
-    accessToken = 'eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzUxMiJ9.eyJzdWIiOiI3NjNjZjZhMy02Yjk3LTQzODAtOGE4Ni1iOTZlNDkwOGUyZmUiLCJhcHBfbmFtZSI6InNwb250b25pdGVzdGVkIiwiYXVkIjpbIm1lcmNoYW50IiwiY2F0YWxvZyIsImZpbmFuY2lhbCIsInJldmlldyIsIm9yZGVyIiwib2F1dGgtc2VydmVyIl0sIm93bmVyX25hbWUiOiJnYWJyaWVsc3BvbnRvbmlkb2VzcGlyaXRvc2FudG8iLCJzY29wZSI6WyJtZXJjaGFudCIsImNhdGFsb2ciLCJyZXZpZXciLCJvcmRlciIsImNvbmNpbGlhdG9yIl0sImlzcyI6ImlGb29kIiwidHlwZSI6ImNvbXBhY3QiLCJleHAiOjE2MjY4MzEwNzgsImlhdCI6MTYyNjgwOTQ3OCwianRpIjoiZGVkOTkyYjctM2VhOC00ZTA0LWIyNGQtZTc2NWExMjkyMzI3IiwibWVyY2hhbnRfc2NvcGVkIjp0cnVlLCJjbGllbnRfaWQiOiI5YzkxMGU1ZC00MDYzLTRiYWQtYjY3Mi0yNmVlM2EzZjNmNWMifQ.NzAJDy4DU3hCn7fdYgote1n5F6GS9iJLjdhLgS11rCnRc_wlwGpgu48wECfKmBKvceyT60tR5Dj7kFkWx-t1VBWInsUk3hTbVgYmQ_roXxC381K-hJeUffIKxlVmWig4PCNxdHoGU_k1APJGgk4BJ3OIrNQ4ijhDWDm5OxNpK-Q';
-    //3 - trabalhar na api
+    refreshToken = 'eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzUxMiJ9.eyJzdWIiOiI3NjNjZjZhMy02Yjk3LTQzODAtOGE4Ni1iOTZlNDkwOGUyZmUiLCJpc3MiOiJpRm9vZCIsImV4cCI6MTYyODAxMDk0NSwiaWF0IjoxNjI3NDA2MTQ1LCJjbGllbnRfaWQiOiI5YzkxMGU1ZC00MDYzLTRiYWQtYjY3Mi0yNmVlM2EzZjNmNWMifQ.ZM0PIdYCuODLfpfb9jMRbQQ_sy2PQR2VWkEW51v6Rp7HDHvFvFyAOva-U0YO2I-tdqyVB1wSJYlc4GnGIQnyO0yz_frasTph0kj2hahIabnhVAyiETfI86ICZF_Xu1wv_NkXqBMm-9d3JfRusjwgaCie1AK8FhV7wKI2dG5fN_Q'
+  
+    //3- Obter novo token de acesso com refreshToken
+    const newToken = await tokenRefresh(refreshToken);
+    console.log(newToken.data)
+    accessToken = newToken.data.accessToken;
+    //4 - trabalhar na api
     const merchants = await getMerchants(accessToken);
-    //console.log (merchants.data);
+    console.log (merchants.data);
 
-    const polling = await getPolling(accessToken);
-    //console.log (polling.data)
+    // const polling = await getPolling(accessToken);
+    // //console.log (polling.data)
 
 
-    const orderId = 'b6edc320-7e24-4785-b896-fa68ce11e375'
-    const driver = await requestDriver(accessToken,orderId);
-    console.log(driver.status, driver.statusText);
+    // const orderId = 'e34a3a9d-2af7-458a-a009-4b44147c6965'
+    // const driver = await requestDriver(accessToken,orderId);
+    // console.log(driver.status, driver.statusText);
     
 
 

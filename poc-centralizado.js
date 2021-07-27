@@ -3,6 +3,9 @@ const axios = require('axios');
 const qs = require('qs')
 
 
+//link sobre como pedir autorizacao : https://www.youtube.com/watch?v=vBVzMfejxgY&ab_channel=iFoodDeveloper
+
+
 
 
 const getToken = async () => {
@@ -80,9 +83,9 @@ const run = async() => {
     //console.log (merchants.data);
 
     const polling = await getPolling(accessToken);
-    //console.log (polling.data)
+    console.log (polling.data)
 
-    const orderId = '2d0b04a5-dd9e-419e-a3ae-7e30bd9941d5'
+    const orderId = 'e34a3a9d-2af7-458a-a009-4b44147c6965'
     const driver = await requestDriver(accessToken,orderId);
     console.log(driver.status, driver.statusText);
 
